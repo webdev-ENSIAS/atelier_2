@@ -1,6 +1,10 @@
 package controller;
 
 import java.io.IOException;
+import java.util.Date;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -8,7 +12,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import atelier_2.db.DBinteraction;
 import atelier_2.model.User;
+import dao.SendMail;
 import dao.UserDAO;
 
 /**
@@ -57,13 +64,25 @@ public class Inscrption extends HttpServlet {
 		String username = request.getParameter("nom");
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		User user = new User(username, email, password);
+		Date date = new Date();
+		String token = DBinteraction.md5(date+email);
+		User user = new User(username, email, password,0,token);
 		//response.getOutputStream().println(user.toString());
 		int n = userDao.addUser(user);
+		//send Email
+		try {
+			SendMail.generateAndSendEmail(email, token, username);
+		} catch (AddressException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (n!=0) {
-			HttpSession session = request.getSession();
-			session.setAttribute("user", user);
-			response.sendRedirect("profil.jsp");
+//			HttpSession session = request.getSession();
+//			session.setAttribute("user", user);
+			response.sendRedirect("login.jsp");
 		} else {
 			response.getOutputStream().println("user not saved");
 		}

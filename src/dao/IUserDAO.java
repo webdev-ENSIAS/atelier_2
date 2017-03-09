@@ -12,4 +12,5 @@ import atelier_2.model.User;
 public interface IUserDAO {
 	public int addUser(User u);
 	User login(String email,String password );
+	int activateUser(String token);
 }

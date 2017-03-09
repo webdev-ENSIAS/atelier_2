@@ -21,12 +21,14 @@ public class UserDAO implements IUserDAO {
 	public int addUser(User u) {
 		int n = 0;
 		Connection con = DBinteraction.getConnection();
-		String sql = "INSERT INTO users VALUES(NULL, ? , ? , ?)";
+		String sql = "INSERT INTO users VALUES(NULL, ? , ? , ? , ? , ?)";
 		try {
 			PreparedStatement st = con.prepareStatement(sql);
 			st.setString(1, u.getUsername());
 			st.setString(2, u.getEmail());
 			st.setString(3, u.getPassword());
+			st.setInt(4, 0);
+			st.setString(5, u.getToken());
 			n = st.executeUpdate();
 			st.close();
 			con.close();
@@ -53,12 +55,32 @@ public class UserDAO implements IUserDAO {
 				u.setUsername(rs.getString("username"));
 				u.setEmail(rs.getString(3));
 				u.setPassword(rs.getString(4));
+				u.setIsValidated(rs.getInt(5));
+				u.setToken(rs.getString(6));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return u;
+	}
+
+	@Override
+	public int activateUser(String token) {
+		int n =0;
+		Connection conn = DBinteraction.getConnection();
+		String sql = "UPDATE users SET isValidated = 1 WHERE token = ?";
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, token);
+			n = st.executeUpdate();
+			st.close();
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return n;
 	}
 
 }

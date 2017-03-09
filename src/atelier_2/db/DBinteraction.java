@@ -3,9 +3,13 @@
  */
 package atelier_2.db;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author Mr.SAAD
@@ -39,4 +43,26 @@ public class DBinteraction {
 			e.printStackTrace();
 		}
 	}
+	
+	public static String md5(String pass) {
+		// TODO Auto-generated method stub
+		String generatedPass = null;
+        MessageDigest md = null;
+        
+			try {
+				md = MessageDigest.getInstance("MD5");
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			md.update(pass.getBytes());
+			byte[] bytes = md.digest();
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < bytes.length; i++) {
+				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+			}
+			generatedPass = sb.toString();
+			return generatedPass;
+	}
+	
 }

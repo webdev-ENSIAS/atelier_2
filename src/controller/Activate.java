@@ -7,22 +7,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import atelier_2.model.User;
 import dao.UserDAO;
 
 /**
- * Servlet implementation class Login
+ * Servlet implementation class Activate
  */
-@WebServlet("/Login")
-public class Login extends HttpServlet {
+@WebServlet("/Activate")
+public class Activate extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       UserDAO userDAO;
+       UserDAO userDao;
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Login() {
+    public Activate() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -31,7 +29,7 @@ public class Login extends HttpServlet {
 	 * @see Servlet#init(ServletConfig)
 	 */
 	public void init(ServletConfig config) throws ServletException {
-		userDAO = new UserDAO();
+		userDao = new UserDAO();
 	}
 
 	/**
@@ -46,7 +44,11 @@ public class Login extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		String token = request.getParameter("token");
+		int n = userDao.activateUser(token);
+		if (n==1) {
+			response.sendRedirect("login.jsp");
+		}
 	}
 
 	/**
@@ -54,27 +56,7 @@ public class Login extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String email = request.getParameter("email");
-		String password = request.getParameter("password");
-		User user = userDAO.login(email, password);
-		
-		//make a simple test on the isValidated field if it's 1 or 0
-		
-		if (user!=null) {
-			if (user.getIsValidated()==1) {
-				HttpSession session = request.getSession();
-				session.setAttribute("user", user);
-				response.sendRedirect("profil.jsp");
-			}else{
-				String error = "Please could you validate your account ";
-				request.setAttribute("errorMsg", error);
-				request.getRequestDispatcher("inscription.jsp").forward(request, response);
-			}
-		} else {
-			String error = "user can not be found";
-			request.setAttribute("errorMsg", error);
-			request.getRequestDispatcher("inscription.jsp").forward(request, response);
-		}
+		doGet(request, response);
 	}
 
 }
